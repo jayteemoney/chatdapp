@@ -1,20 +1,36 @@
-require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config(); // Load variables from .env
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+import { vars } from "hardhat/config";
+
 
 /** @type import('hardhat/config').HardhatUserConfig */
+
 module.exports = {
-  solidity: "0.8.28", // Matches your contract's pragma ^0.8.28
+  solidity: "0.8.28",
   networks: {
-    hardhat: {}, // Local development network (default)
-    sepolia: {
-      url: process.env.SEPOLIA_RPC_URL || "https://rpc.sepolia.org", // Fallback to public RPC if .env not set
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      chainId: 11155111, // Sepolia chain ID (optional, for clarity)
+    'lisk-sepolia': {
+      url: 'https://rpc.sepolia-api.lisk.com',
+     
+      accounts: [vars.get("PRIVATE_KEY")],
     },
   },
   etherscan: {
+    // Use "123" as a placeholder, because Blockscout doesn't need a real API key, and Hardhat will complain if this property isn't set.
     apiKey: {
-      sepolia: process.env.ETHERSCAN_API_KEY || "", // For contract verification on Etherscan
+      "lisk-sepolia": "123"
     },
+    customChains: [
+      {
+          network: "lisk-sepolia",
+          chainId: 4202,
+          urls: {
+              apiURL: "https://sepolia-blockscout.lisk.com/api",
+              browserURL: "https://sepolia-blockscout.lisk.com"
+          }
+      }
+    ]
+  },
+ sourcify: {
+    enabled: false
   },
 };

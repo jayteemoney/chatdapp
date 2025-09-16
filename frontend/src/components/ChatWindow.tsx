@@ -85,7 +85,7 @@ const ChatWindow = ({ selectedUser, onSelectUser }: ChatWindowProps) => {
         <h2 className="text-xl font-bold">
           {activeTab === 'group' ? 'Group Chat' : `Chat with ${selectedUser?.name || ''}`}
         </h2>
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 w-2/4">
           <button
             onClick={() => { setActiveTab('group'); onSelectUser(undefined); }}
             className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === 'group' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'}`}

@@ -15,6 +15,7 @@ const RegistrationForm = () => {
     }
 
     const imageCid = await uploadFile(image);
+
     if (imageCid) {
       registerUser(name, imageCid);
     }
