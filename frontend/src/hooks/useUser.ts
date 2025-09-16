@@ -11,7 +11,7 @@ export const useUser = () => {
     functionName: 'getUser',
     args: [address],
     query: {
-      enabled: !!address, // Only run the query if the user's address is available
+      enabled: !!address, 
     },
   });
 

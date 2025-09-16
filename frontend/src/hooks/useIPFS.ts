@@ -19,6 +19,7 @@ const useIPFS = () => {
         }
       });
 
+      // @ts-ignore
       return response.data.IpfsHash;
     } catch (e) {
       setError(e as Error);
