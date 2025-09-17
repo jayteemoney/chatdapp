@@ -8,7 +8,7 @@ const ChatPage = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 h-screen">
-      <div className="md:col-span-1 border-r border-gray-200">
+      <div className="md:col-span-1 border-r border-gray-800 mr-4">
         <UserList onSelectUser={setSelectedUser} selectedUser={selectedUser} />
       </div>
       <div className="md:col-span-3">

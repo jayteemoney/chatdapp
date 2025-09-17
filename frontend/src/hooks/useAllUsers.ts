@@ -28,8 +28,7 @@ export const useAllUsers = () => {
       return [];
     }
 
-    // The data from the contract can be an array of objects or an array of arrays.
-    // This logic handles both cases robustly.
+    
     const firstElement = data[0];
     let mappedUsers: User[];
 

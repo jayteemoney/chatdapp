@@ -43,30 +43,36 @@ const UserList = ({ onSelectUser, selectedUser }: UserListProps) => {
   }
 
   return (
-    <div className="h-full bg-gray-50 border-r border-gray-200">
-      <h2 className="p-4 text-xl font-bold border-b">Users</h2>
+    <div className="h-full bg-white shadow-xl rounded-lg overflow-hidden">
+      <h2 className="p-4 text-2xl font-bold text-gray-800">Conversations</h2>
       <ul className="overflow-y-auto">
         {otherUsers.length > 0 ? (
           otherUsers.map((user) => (
-            <li 
-              key={user.walletAddress} 
-              className={`flex items-center p-3 space-x-3 cursor-pointer hover:bg-gray-200 ${selectedUser?.walletAddress === user.walletAddress ? 'bg-indigo-100' : ''}`}
+            <li
+              key={user.walletAddress}
+              className={`flex items-center p-4 space-x-4 cursor-pointer transition-all duration-200 ease-in-out hover:bg-gray-100 ${selectedUser?.walletAddress === user.walletAddress ? 'bg-indigo-100' : ''}`}
               onClick={() => onSelectUser(user)}
             >
-              <img 
-                src={`https://gateway.pinata.cloud/ipfs/${user.imageCid}`} 
-                alt={user.name} 
-                className="w-10 h-10 bg-gray-300 rounded-full object-cover"
+              <img
+                src={`https://gateway.pinata.cloud/ipfs/${user.imageCid}`}
+                alt={user.name}
+                className="w-12 h-12 bg-gray-300 rounded-full object-cover shadow-lg"
                 onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/40' }}
               />
               <div className="overflow-hidden">
-                <p className="font-semibold truncate">{user.name}</p>
+                <p className="font-semibold text-gray-800 truncate">{user.name}</p>
                 <p className="text-sm text-gray-500 truncate">{user.walletAddress}</p>
               </div>
+              {selectedUser?.walletAddress === user.walletAddress && (
+                <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+              )}
             </li>
           ))
         ) : (
-          <li className="p-3 text-center text-gray-500">No other users found.</li>
+          <li className="p-4 text-center text-gray-500">
+            <p className="font-semibold">No other users yet</p>
+            <p className="text-sm">Invite someone to chat!</p>
+          </li>
         )}
       </ul>
     </div>

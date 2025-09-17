@@ -6,6 +6,7 @@ import { User } from '../hooks/useAllUsers';
 import { useWatchContractEvent } from 'wagmi';
 import { chatContractAddress } from '../config';
 import ChatABI from '../ABIs/Chat.json';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 // import { log } from 'console';
 
 interface ChatWindowProps {
@@ -70,45 +71,50 @@ const ChatWindow = ({ selectedUser, onSelectUser }: ChatWindowProps) => {
     }
 
     return (messagesToDisplay as any[]).map((msg, index) => (
-        <div key={index} className={`flex my-2 ${msg.sender === currentUserAddress ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg shadow-md ${msg.sender === currentUserAddress ? 'bg-indigo-500 text-white' : 'bg-white text-gray-900'}`}>
-                <p className="text-sm">{msg.content}</p>
-                <p className="text-xs text-right mt-1 opacity-75">{new Date(Number(msg.timestamp) * 1000).toLocaleTimeString()}</p>
+        <div key={index} className={`flex my-3 ${msg.sender === currentUserAddress ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-md lg:max-w-lg px-4 py-3 rounded-2xl shadow-xl ${msg.sender === currentUserAddress ? 'bg-indigo-600 text-white' : 'bg-white text-gray-900'}`}>
+                <p className="text-base">{msg.content}</p>
+                <p className="text-xs text-right mt-2 opacity-60">{new Date(Number(msg.timestamp) * 1000).toLocaleTimeString()}</p>
             </div>
         </div>
     ));
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      <header className="flex items-center justify-between p-4 bg-white border-b">
-        <h2 className="text-xl font-bold">
+    <div className="flex flex-col h-screen bg-gray-100">
+      <header className="flex items-center justify-between p-4 bg-white shadow-lg">
+        <h2 className="text-2xl font-bold text-gray-800">
           {activeTab === 'group' ? 'Group Chat' : `Chat with ${selectedUser?.name || ''}`}
         </h2>
-        <div className="flex space-x-2 w-2/4">
-          <button
-            onClick={() => { setActiveTab('group'); onSelectUser(undefined); }}
-            className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === 'group' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'}`}
-          >
-            Group Chat
-          </button>
-          <button
-            onClick={() => setActiveTab('private')}
-            disabled={!selectedUser}
-            className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === 'private' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:bg-gray-100'} disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            Private Chat
-          </button>
+        <div className="flex items-center space-x-4">
+          <div className="flex space-x-2">
+            <button
+              onClick={() => { setActiveTab('group'); onSelectUser(undefined); }}
+              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ease-in-out ${activeTab === 'group' ? 'bg-indigo-500 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}
+            >
+              Group Chat
+            </button>
+            <button
+              onClick={() => setActiveTab('private')}
+              disabled={!selectedUser}
+              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ease-in-out ${activeTab === 'private' ? 'bg-indigo-500 text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'} disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              Private Chat
+            </button>
+          </div>
+          <ConnectButton />
         </div>
       </header>
-      <main className="flex-grow p-4 overflow-y-auto">
+      <main className="flex-grow p-6 overflow-y-auto">
         {renderMessages()}
         <div ref={messagesEndRef} />
       </main>
-      <MessageInput 
-        chatType={activeTab} 
-        recipient={activeTab === 'private' ? selectedUser?.walletAddress : undefined} 
-      />
+      <div className="p-4 bg-white">
+        <MessageInput
+          chatType={activeTab}
+          recipient={activeTab === 'private' ? selectedUser?.walletAddress : undefined}
+        />
+      </div>
     </div>
   );
 };
