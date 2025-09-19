@@ -11,6 +11,8 @@ contract Chat {
     }
 
     Register private _registerContract;
+    address public owner;
+    address public automationContract;
 
     Message[] public groupMessages;
 
@@ -22,6 +24,12 @@ contract Chat {
     constructor(address registerContractAddress) {
         require(registerContractAddress != address(0), "Invalid register contract address");
         _registerContract = Register(registerContractAddress);
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this function");
+        _;
     }
 
     modifier onlyRegisteredUser() {
@@ -32,10 +40,26 @@ contract Chat {
         _;
     }
 
+    modifier onlyAutomation() {
+        require(msg.sender == automationContract, "Only automation contract can call this");
+        _;
+    }
+
+    function setAutomationContract(address _automationContract) public onlyOwner {
+        automationContract = _automationContract;
+    }
+
     function sendGroupMessage(string calldata content) public onlyRegisteredUser {
         require(bytes(content).length > 0, "Message content cannot be empty");
         groupMessages.push(Message(msg.sender, content, block.timestamp));
         emit GroupMessageSent(msg.sender, content, block.timestamp);
+    }
+
+    function sendAutomatedGroupMessage(string calldata content) public onlyAutomation {
+        require(bytes(content).length > 0, "Message content cannot be empty");
+        // Using automationContract as sender
+        groupMessages.push(Message(automationContract, content, block.timestamp));
+        emit GroupMessageSent(automationContract, content, block.timestamp);
     }
 
     function getGroupMessages() public view returns (Message[] memory) {
