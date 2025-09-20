@@ -68,6 +68,19 @@
     },
     {
       "inputs": [],
+      "name": "automationContract",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "getGroupMessages",
       "outputs": [
         {
@@ -167,6 +180,19 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "address",
@@ -213,6 +239,19 @@
           "type": "string"
         }
       ],
+      "name": "sendAutomatedGroupMessage",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "content",
+          "type": "string"
+        }
+      ],
       "name": "sendGroupMessage",
       "outputs": [],
       "stateMutability": "nonpayable",
@@ -232,6 +271,19 @@
         }
       ],
       "name": "sendPrivateMessage",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_automationContract",
+          "type": "address"
+        }
+      ],
+      "name": "setAutomationContract",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

@@ -1,80 +1,86 @@
-import { useAllUsers, User } from '../hooks/useAllUsers';
 import { useAccount } from 'wagmi';
-import { useWatchContractEvent } from 'wagmi';
+import AutomationStatus from './AutomationStatus';
+import { useReadContract } from 'wagmi';
 import { registerContractAddress } from '../config';
 import RegisterABI from '../ABIs/Register.json';
-import { useMemo, useEffect } from 'react';
+
+interface User {
+  name: string;
+  walletAddress: `0x${string}`;
+  imageCid: string;
+}
 
 interface UserListProps {
-    onSelectUser: (user: User) => void;
-    selectedUser: User | undefined;
+  onSelectUser: (user: User) => void;
+  selectedUser: User | undefined;
 }
 
 const UserList = ({ onSelectUser, selectedUser }: UserListProps) => {
-  const { users, isLoading, error, refetch } = useAllUsers();
   const { address: currentUserAddress } = useAccount();
 
-  useEffect(() => {
-    if (error) {
-      console.error("UserList component error:", error);
-    }
-  }, [error]);
-
-  useWatchContractEvent({
+  const { data: allUsers, isLoading: isAllUsersLoading } = useReadContract({
     address: registerContractAddress,
     abi: RegisterABI,
-    eventName: 'UserRegistered',
-    onLogs() {
-      refetch();
-    },
+    functionName: 'getAllUsers',
   });
 
-  const otherUsers = useMemo(() => {
-    if (!users || !currentUserAddress) return [];
-    return users.filter(user => user && user.walletAddress && user.walletAddress.toLowerCase() !== currentUserAddress.toLowerCase());
-  }, [users, currentUserAddress]);
+  const { data: currentUser, isLoading: isUserLoading } = useReadContract({
+    address: registerContractAddress,
+    abi: RegisterABI,
+    functionName: 'getUser',
+    args: [currentUserAddress],
+  });
 
-  if (isLoading) {
-    return <div className="p-4 text-center text-gray-500">Loading users...</div>;
+  if (isAllUsersLoading || isUserLoading) {
+    return <div className="p-4 text-gray-500">Loading users...</div>;
   }
 
-  if (error) {
-    return <div className="p-4 text-center text-red-500">Error loading users. Please check the console.</div>;
+  if (!allUsers || !currentUser) {
+    return <div className="p-4 text-red-500">Could not load user data.</div>;
   }
+
+  const otherUsers = (allUsers as User[]).filter(
+    (user) => user.walletAddress !== currentUserAddress
+  );
 
   return (
-    <div className="h-full bg-white shadow-xl rounded-lg overflow-hidden">
-      <h2 className="p-4 text-2xl font-bold text-gray-800">Conversations</h2>
-      <ul className="overflow-y-auto">
-        {otherUsers.length > 0 ? (
-          otherUsers.map((user) => (
+    <div className="h-full bg-gray-50 text-gray-800 flex flex-col">
+      <div className="p-4 border-b border-gray-200 flex items-center">
+        <img
+          src={`https://gateway.pinata.cloud/ipfs/${(currentUser as User).imageCid}`}
+          alt={(currentUser as User).name}
+          className="w-12 h-12 rounded-full mr-4 object-cover"
+        />
+        <div>
+          <h2 className="text-xl font-bold">Welcome, {(currentUser as User).name}</h2>
+          <p className="text-sm text-gray-500">
+            {(currentUserAddress as `0x${string}`).slice(0, 6)}...
+            {(currentUserAddress as `0x${string}`).slice(-4)}
+          </p>
+        </div>
+      </div>
+      <AutomationStatus />
+      <div className="flex-grow overflow-y-auto">
+        <h3 className="p-4 text-lg font-semibold text-gray-600">Users</h3>
+        <ul>
+          {otherUsers.map((user) => (
             <li
               key={user.walletAddress}
-              className={`flex items-center p-4 space-x-4 cursor-pointer transition-all duration-200 ease-in-out hover:bg-gray-100 ${selectedUser?.walletAddress === user.walletAddress ? 'bg-indigo-100' : ''}`}
               onClick={() => onSelectUser(user)}
+              className={`flex items-center p-4 cursor-pointer hover:bg-gray-200 ${
+                selectedUser?.walletAddress === user.walletAddress ? 'bg-gray-200' : ''
+              }`}
             >
               <img
                 src={`https://gateway.pinata.cloud/ipfs/${user.imageCid}`}
                 alt={user.name}
-                className="w-12 h-12 bg-gray-300 rounded-full object-cover shadow-lg"
-                onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/40' }}
+                className="w-10 h-10 rounded-full mr-4 object-cover"
               />
-              <div className="overflow-hidden">
-                <p className="font-semibold text-gray-800 truncate">{user.name}</p>
-                <p className="text-sm text-gray-500 truncate">{user.walletAddress}</p>
-              </div>
-              {selectedUser?.walletAddress === user.walletAddress && (
-                <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-              )}
+              <p className="font-semibold">{user.name}</p>
             </li>
-          ))
-        ) : (
-          <li className="p-4 text-center text-gray-500">
-            <p className="font-semibold">No other users yet</p>
-            <p className="text-sm">Invite someone to chat!</p>
-          </li>
-        )}
-      </ul>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

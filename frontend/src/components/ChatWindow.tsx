@@ -2,12 +2,17 @@ import { useState, useEffect, useRef } from 'react';
 import MessageInput from './MessageInput';
 import { useChat, usePrivateMessages } from '../hooks/useChat';
 import { useAccount } from 'wagmi';
-import { User } from '../hooks/useAllUsers';
 import { useWatchContractEvent } from 'wagmi';
 import { chatContractAddress } from '../config';
 import ChatABI from '../ABIs/Chat.json';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-// import { log } from 'console';
+import { useAutomation } from '../hooks/useAutomation';
+
+interface User {
+  name: string;
+  walletAddress: `0x${string}`;
+  imageCid: string;
+}
 
 interface ChatWindowProps {
     selectedUser: User | undefined;
@@ -21,6 +26,7 @@ const ChatWindow = ({ selectedUser, onSelectUser }: ChatWindowProps) => {
 
   const { groupMessages, refetchGroupMessages } = useChat();
   const { privateMessages, refetchPrivateMessages } = usePrivateMessages(currentUserAddress, selectedUser?.walletAddress);
+  const { automationContractAddress } = useAutomation();
 
   useWatchContractEvent({
     address: chatContractAddress,
@@ -70,14 +76,28 @@ const ChatWindow = ({ selectedUser, onSelectUser }: ChatWindowProps) => {
         return <div className="text-center text-gray-500">Select a user to start a private chat.</div>;
     }
 
-    return (messagesToDisplay as any[]).map((msg, index) => (
-        <div key={index} className={`flex my-3 ${msg.sender === currentUserAddress ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-md lg:max-w-lg px-4 py-3 rounded-2xl shadow-xl ${msg.sender === currentUserAddress ? 'bg-indigo-600 text-white' : 'bg-white text-gray-900'}`}>
-                <p className="text-base">{msg.content}</p>
-                <p className="text-xs text-right mt-2 opacity-60">{new Date(Number(msg.timestamp) * 1000).toLocaleTimeString()}</p>
+    return (messagesToDisplay as any[]).map((msg, index) => {
+        const isAutomationMessage = msg.sender === automationContractAddress;
+        // const messageSender = isAutomationMessage ? 'Chainlink Automation' : msg.sender;
+
+        return (
+            <div key={index} className={`flex my-3 ${msg.sender === currentUserAddress ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-md lg:max-w-lg px-4 py-3 rounded-2xl shadow-xl ${
+                    isAutomationMessage 
+                        ? 'bg-blue-500 text-white' 
+                        : msg.sender === currentUserAddress 
+                            ? 'bg-indigo-600 text-white' 
+                            : 'bg-white text-gray-900'
+                }`}>
+                    {isAutomationMessage && <p className="text-sm font-bold mb-1">🤖 Automated Price Feed</p>}
+                    <p className="text-base">{msg.content}</p>
+                    <p className="text-xs text-right mt-2 opacity-60">
+                        {new Date(Number(msg.timestamp) * 1000).toLocaleTimeString()}
+                    </p>
+                </div>
             </div>
-        </div>
-    ));
+        );
+    });
   };
 
   return (
