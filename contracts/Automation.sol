@@ -64,12 +64,20 @@ contract Automation is AutomationCompatible {
     function _formatPrice(int _price, uint8 _decimals) internal pure returns (string memory) {
         uint256 divisor = 10 ** _decimals;
         uint256 uprice = uint256(int256(_price));
-        return string(
-            abi.encodePacked(
-                Strings.toString(uprice / divisor),
-                ".",
-                Strings.toString(uprice % divisor)
-            )
-        );
+        string memory integerPart = Strings.toString(uprice / divisor);
+        
+        if (_decimals <= 2) {
+            return integerPart;
+        }
+
+        uint256 remainder = uprice % divisor;
+        uint256 fractionalDivisor = 10 ** (_decimals - 2);
+        uint256 fractionalPart = remainder / fractionalDivisor;
+        
+        if (fractionalPart < 10) {
+            return string(abi.encodePacked(integerPart, ".0", Strings.toString(fractionalPart)));
+        } else {
+            return string(abi.encodePacked(integerPart, ".", Strings.toString(fractionalPart)));
+        }
     }
 }

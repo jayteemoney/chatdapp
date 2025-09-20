@@ -78,7 +78,7 @@ const ChatWindow = ({ selectedUser, onSelectUser }: ChatWindowProps) => {
 
     return (messagesToDisplay as any[]).map((msg, index) => {
         const isAutomationMessage = msg.sender === automationContractAddress;
-        const messageSender = isAutomationMessage ? 'Chainlink Automation' : msg.sender;
+        // const messageSender = isAutomationMessage ? 'Chainlink Automation' : msg.sender;
 
         return (
             <div key={index} className={`flex my-3 ${msg.sender === currentUserAddress ? 'justify-end' : 'justify-start'}`}>

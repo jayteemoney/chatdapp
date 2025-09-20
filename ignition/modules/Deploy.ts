@@ -1,6 +1,6 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
-const UPDATE_INTERVAL = 10800; // 3 hours
+const UPDATE_INTERVAL = 3600; // 1 hour
 
 const DeployModule = buildModule("DeployModule", (m) => {
   const register = m.contract("Register");
